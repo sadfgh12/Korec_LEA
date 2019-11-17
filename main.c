@@ -5,16 +5,52 @@
 typedef unsigned char u8;
 typedef unsigned int u32;
 
+u32 ROL(u32 M, int n)
+{
+	u32 temp = M;
+	temp >>= 32 - n;
+	M <<= n;
+	M |= temp;
+	return M;
+}
+
 void RoundKeyGeneration128(u8 MK[], u8 RK[])
 {
-	u32 W[44];
-	u32 i, T;
-	W[0] = u4byte_in(MK);
-	W[1] = u4byte_in(MK + 4);
-	W[2] = u4byte_in(MK + 8);
-	W[3] = u4byte_in(MK + 12);
-	for (i = 1; i <= Nr; i++) {
-		// Å°½ºÄÉÁÙ ÄÚµå Ãß°¡ÇÏ±â
+	u32 P[8] = { 0xc3efe9db , 0x44626b02 , 0x79e27c8a , 0x78df30ec , 0x715ea49e , 0xc785da0a , 0xe04ef22a, 0xe5c40957 };
+	u32 T[4] = { 0x00000000 };
+	u8 n = 0;
+	for (u8 i = 0; i < 4; i++) {
+		T[i] = u4byte_in(MK + i * 4);
+	}
+	for (u8 j = 0; j < 24; j++) {
+		T[0] = ROL(T[0] + ROL(P[j % 4], j), 1);
+		T[1] = ROL(T[1] + ROL(P[j % 4], j + 1), 3);
+		T[2] = ROL(T[2] + ROL(P[j % 4], j + 2), 6);
+		T[3] = ROL(T[3] + ROL(P[j % 4], j + 3), 11);
+		for (u8 i = 0; i < 4; i++) {
+			RK[n] = (T[0] >> (24 - 8 * i)) & 0xff;
+			n++;
+		}
+		for (u8 i = 0; i < 4; i++) {
+			RK[n] = (T[1] >> (24 - 8 * i)) & 0xff;
+			n++;
+		}
+		for (u8 i = 0; i < 4; i++) {
+			RK[n] = (T[2] >> (24 - 8 * i)) & 0xff;
+			n++;
+		}
+		for (u8 i = 0; i < 4; i++) {
+			RK[n] = (T[1] >> (24 - 8 * i)) & 0xff;
+			n++;
+		}
+		for (u8 i = 0; i < 4; i++) {
+			RK[n] = (T[3] >> (24 - 8 * i)) & 0xff;
+			n++;
+		}
+		for (u8 i = 0; i < 4; i++) {
+			RK[n] = (T[1] >> (24 - 8 * i)) & 0xff;
+			n++;
+		}
 	}
 }
 
@@ -31,7 +67,7 @@ u32 u4byte_in(u8* x)
 
 void LEA_Round(u8 S[16], u8 K[16]) {
 
-	// ÄÚµå Ã¤¿ì±â
+	// ì½”ë“œ ì±„ìš°ê¸°
 }
 
 void LEA_ENC(u8 PT[16], u8 CT[16], u8 RK[], u32 keysize) {
@@ -53,7 +89,7 @@ void LEA_ENC(u8 PT[16], u8 CT[16], u8 RK[], u32 keysize) {
 }
 
 void LEA_DEC_Round(u8 S[16], u8 K[16]) {
-	// ÄÚµå Ã¤¿ì±â
+	// ì½”ë“œ ì±„ìš°ê¸°
 }
 
 void LEA_DEC(u8 PT[16], u8 CT[16], u8 RK[], u32 keysize) {
@@ -80,7 +116,7 @@ int main(int argc, char* argv[]) {
 	u8 PT[Nb] = { 0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E };
 	u8 CT[Nb] = { 0x00, };
 	u8 MK[Nb] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
-	u8 RK[Nr * Nb] = { 0x00, };
+	u8 RK[Nr * N] = { 0x00, };
 
 	LEA_KeySchedule(MK, RK, keysize);
 	LEA_ENC(PT, CT, RK, keysize);
@@ -91,7 +127,7 @@ int main(int argc, char* argv[]) {
 	LEA_DEC(PT, CT, RK, keysize);
 
 	/*
-	enc, dec ¼º°ø ½Ã Á÷Á¢ ÆÄÀÏ ³Ö¾î¼­ enc, dec ÇÒ ¿¹Á¤
+	enc, dec ì„±ê³µ ì‹œ ì§ì ‘ íŒŒì¼ ë„£ì–´ì„œ enc, dec í•  ì˜ˆì •
 	FILE *rfp, *wfp;
 	u8 r;
 	u32 DataLen;
@@ -99,9 +135,9 @@ int main(int argc, char* argv[]) {
 
 
 	fopen_s(&rfp, argv[2], "rb");
-	if (rfp == NULL)//¿­±â ½ÇÆĞÀÏ ¶§
+	if (rfp == NULL)//ì—´ê¸° ì‹¤íŒ¨ì¼ ë•Œ
 	{
-	   perror("fopen ½ÇÆĞ");//¿¡·¯ ¸Ş½ÃÁö Ãâ·Â
+	   perror("fopen ì‹¤íŒ¨");//ì—ëŸ¬ ë©”ì‹œì§€ ì¶œë ¥
 	   return 0;
 	}
 
@@ -109,9 +145,9 @@ int main(int argc, char* argv[]) {
 	DataLen = ftell(rfp);
 	fseek(rfp, 0, SEEK_SET);
 	fopen_s(&wfp, argv[3], "wb");
-	if (wfp == NULL)//¿­±â ½ÇÆĞÀÏ ¶§
+	if (wfp == NULL)//ì—´ê¸° ì‹¤íŒ¨ì¼ ë•Œ
 	{
-	   perror("fopen ½ÇÆĞ");//¿¡·¯ ¸Ş½ÃÁö Ãâ·Â
+	   perror("fopen ì‹¤íŒ¨");//ì—ëŸ¬ ë©”ì‹œì§€ ì¶œë ¥
 	   return 0;
 	}
 
