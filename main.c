@@ -88,8 +88,26 @@ void LEA_ENC(u8 PT[16], u8 CT[16], u8 RK[], u32 keysize) {
 	CT[12] = temp[12]; CT[13] = temp[13]; CT[14] = temp[14]; CT[15] = temp[15];
 }
 
+u32 inttobit(u8 a, u8 b) {
+	if (b < a)
+		return 0xffffffff - (a - b);
+	else
+		return b - a;
+}
+u32 ROR9(u32 a) {
+	return (a >> 9) ^ ((a & 0x1ff) << 23);
+}
+
 void LEA_DEC_Round(u8 S[16], u8 K[16]) {
-	// 코드 채우기
+	u8 C[16];
+	for (int i = 0; i < 16; i++) {
+		C[i] = S[i];
+	}
+	S[0] = C[3];
+	S[1] = inttobit(ROR9(C[0]), (S[0] ^ RKec[0])) ^ RKec[1];
+	S[2] = inttobit(ROL(C[1], 5), (S[1] ^ RKec[2])) ^ RKec[3];
+	S[3] = inttobit(ROL(C[2], 3), (S[2] ^ RKec[4])) ^ RKec[5];
+	
 }
 
 void LEA_DEC(u8 PT[16], u8 CT[16], u8 RK[], u32 keysize) {
