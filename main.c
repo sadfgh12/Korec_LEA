@@ -14,7 +14,7 @@ void RoundKeyGeneration128(u8 MK[], u8 RK[])
 	W[2] = u4byte_in(MK + 8);
 	W[3] = u4byte_in(MK + 12);
 	for (i = 1; i <= Nr; i++) {
-		// Å°½ºÄÉÁÙ ÄÚµå Ãß°¡ÇÏ±â
+		// í‚¤ìŠ¤ì¼€ì¤„ ì½”ë“œ ì¶”ê°€í•˜ê¸°
 	}
 }
 
@@ -29,9 +29,9 @@ u32 u4byte_in(u8* x)
 	return (x[0] << 24) | (x[1] << 16) | (x[2] << 8) | x[3];
 }
 
-void LEA_Round(u8 S[16], u8 K[16]) {
+void LEA_Round(u8 S[16], u8 K[24]) {
 
-	// ÄÚµå Ã¤¿ì±â
+	// ì½”ë“œ ì±„ìš°ê¸°
 }
 
 void LEA_ENC(u8 PT[16], u8 CT[16], u8 RK[], u32 keysize) {
@@ -52,8 +52,8 @@ void LEA_ENC(u8 PT[16], u8 CT[16], u8 RK[], u32 keysize) {
 	CT[12] = temp[12]; CT[13] = temp[13]; CT[14] = temp[14]; CT[15] = temp[15];
 }
 
-void LEA_DEC_Round(u8 S[16], u8 K[16]) {
-	// ÄÚµå Ã¤¿ì±â
+void LEA_DEC_Round(u8 S[16], u8 K[24]) {
+	// ì½”ë“œ ì±„ìš°ê¸°
 }
 
 void LEA_DEC(u8 PT[16], u8 CT[16], u8 RK[], u32 keysize) {
@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
 	LEA_DEC(PT, CT, RK, keysize);
 
 	/*
-	enc, dec ¼º°ø ½Ã Á÷Á¢ ÆÄÀÏ ³Ö¾î¼­ enc, dec ÇÒ ¿¹Á¤
+	enc, dec ì„±ê³µ ì‹œ ì§ì ‘ íŒŒì¼ ë„£ì–´ì„œ enc, dec í•  ì˜ˆì •
 	FILE *rfp, *wfp;
 	u8 r;
 	u32 DataLen;
@@ -99,9 +99,9 @@ int main(int argc, char* argv[]) {
 
 
 	fopen_s(&rfp, argv[2], "rb");
-	if (rfp == NULL)//¿­±â ½ÇÆÐÀÏ ¶§
+	if (rfp == NULL)//ì—´ê¸° ì‹¤íŒ¨ì¼ ë•Œ
 	{
-	   perror("fopen ½ÇÆÐ");//¿¡·¯ ¸Þ½ÃÁö Ãâ·Â
+	   perror("fopen ì‹¤íŒ¨");//ì—ëŸ¬ ë©”ì‹œì§€ ì¶œë ¥
 	   return 0;
 	}
 
@@ -109,9 +109,9 @@ int main(int argc, char* argv[]) {
 	DataLen = ftell(rfp);
 	fseek(rfp, 0, SEEK_SET);
 	fopen_s(&wfp, argv[3], "wb");
-	if (wfp == NULL)//¿­±â ½ÇÆÐÀÏ ¶§
+	if (wfp == NULL)//ì—´ê¸° ì‹¤íŒ¨ì¼ ë•Œ
 	{
-	   perror("fopen ½ÇÆÐ");//¿¡·¯ ¸Þ½ÃÁö Ãâ·Â
+	   perror("fopen ì‹¤íŒ¨");//ì—ëŸ¬ ë©”ì‹œì§€ ì¶œë ¥
 	   return 0;
 	}
 
