@@ -5,4 +5,4 @@ Korec_LEA
 ------------------------------------------------
 
 + 11.04
-  + create project (sadfgh12)
+  + create project (**sadfgh12**)
